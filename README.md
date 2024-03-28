@@ -1,4 +1,4 @@
-Optimize the UI display to improve experiences ( Fork of https://github.com/SiriusXT/trilium-auto-hide-info-bar)
+Optimize the UI display to improve experiences, but you can't set to hide one of them individually anymore. ( Fork of https://github.com/SiriusXT/trilium-auto-hide-info-bar)
 
 -----
 
