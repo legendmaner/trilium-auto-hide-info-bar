@@ -88,6 +88,11 @@ class hiddenRibbon extends api.NoteContextAwareWidget {
     }
 
     async refreshWithNote(note) {
+        //skip search note
+        if (note.mime == 'application/json' && note.type == 'search') {
+            return ;
+        }
+        
         $(document).ready(function () {            
             if (!$("div.component.note-split:not(.hidden-ext) div.ribbon-tab-title").hasClass('hidden-ribbon-pin')) {
                 $("div.component.note-split:not(.hidden-ext) .ribbon-tab-title:not(.backToHis)").last().after(`<div class="hidden-ribbon-pin ribbon-tab-spacer" ></div>
