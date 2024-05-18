@@ -13,6 +13,7 @@ const DISPLAYED = 1;
 const HIDING = 2;
 const DISPLAYING = 3;
 let display_status = HIDDEN;
+let enable_status = true;
 
 
 if (!hidden_title && !hidden_ribbon) { return }
@@ -26,7 +27,7 @@ var pinButton = function () {
 };
  
 function display(ignore_status = false) {
-    console.log(`display: cur status: ${display_status}`);
+    //console.log(`display: cur status: ${display_status}`);
     if (!ignore_status) {
         if (display_status == DISPLAYED || display_status == HIDING) {
             return ;
@@ -75,6 +76,12 @@ class hiddenRibbon extends api.NoteContextAwareWidget {
     get parentWidget() {
         return 'center-pane';
     }
+    
+    isEnabled() {
+        enable_status = super.isEnabled() && !(this.note.type === 'search');
+        return enable_status;
+    }
+    
     doRender() {
         this.$widget = $(`<style type="text/css">
 	.hidden-ribbon-pin.ribbon-tab-title-icon.bx.hidden:before {
@@ -88,11 +95,6 @@ class hiddenRibbon extends api.NoteContextAwareWidget {
     }
 
     async refreshWithNote(note) {
-        //skip search note
-        if (note.mime == 'application/json' && note.type == 'search') {
-            return ;
-        }
-        
         $(document).ready(function () {            
             if (!$("div.component.note-split:not(.hidden-ext) div.ribbon-tab-title").hasClass('hidden-ribbon-pin')) {
                 $("div.component.note-split:not(.hidden-ext) .ribbon-tab-title:not(.backToHis)").last().after(`<div class="hidden-ribbon-pin ribbon-tab-spacer" ></div>
@@ -111,7 +113,7 @@ class hiddenRibbon extends api.NoteContextAwareWidget {
             
             var timeoutEnter,timeoutLeave;
             $("div.component.note-split:not(.hidden-ext) div.component.scrolling-container").mouseenter(function () {
-                if (display_status == HIDDEN || display_status == HIDING) {
+                if (!enable_status || display_status == HIDDEN || display_status == HIDING) {
                     return;
                 }
                 display_status = HIDING;
@@ -124,7 +126,7 @@ class hiddenRibbon extends api.NoteContextAwareWidget {
                 }, delay_execution_time); 
             })
             $('div.component.note-split:not(.hidden-ext) div.component.title-row').mouseenter(function (event) {
-                if (display_status == DISPLAYED || display_status == DISPLAYING) {
+                if (!enable_status || display_status == DISPLAYED || display_status == DISPLAYING) {
                     return;
                 }
                 display_status = DISPLAYING;
@@ -135,11 +137,13 @@ class hiddenRibbon extends api.NoteContextAwareWidget {
                     },delay_execution_time);
             });
             $('div.component.note-split:not(.hidden-ext) div.component.title-row').mouseleave(function (event) {
+                if (!enable_status) return ;
+                
                 clearTimeout(timeoutEnter); 
                 clearTimeout(timeoutLeave);
             });
             $('div.tab-row-widget.component').mouseenter(function (event) {
-                if (display_status == DISPLAYED || display_status == DISPLAYING) {
+                if (!enable_status || display_status == DISPLAYED || display_status == DISPLAYING) {
                     return;
                 }
                 display_status = DISPLAYING;
@@ -152,7 +156,7 @@ class hiddenRibbon extends api.NoteContextAwareWidget {
                 
                 
             $('div.component.note-split:not(.hidden-ext) div.ribbon-container.component').mouseenter(function (event) {
-                if (display_status == DISPLAYED || display_status == DISPLAYING) {
+                if (!enable_status || display_status == DISPLAYED || display_status == DISPLAYING) {
                     return;
                 }
                 display_status = DISPLAYING;
